@@ -3,76 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-    <title>App-Personal</title>
-
-    <meta name="mobile-web-app-capable" content="yes">
+    <title>Личный Кабинет</title>
+    
+    <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="Установщик">
-    <meta name="theme-color" content="#ffffff">
-
-    <link rel="apple-touch-icon" href="https://via.placeholder.com/180/007aff/ffffff?text=P">
-    <link rel="icon" type="image/png" href="https://via.placeholder.com/180/007aff/ffffff?text=P">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; font-family: -apple-system, sans-serif; background: #ffffff; color: #000; }
-        .container { padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center; }
-        .app-list { width: 100%; max-width: 400px; margin-top: 20px; }
-        .item { 
-            background: #f2f2f7; padding: 15px; border-radius: 12px; margin-bottom: 10px; 
-            display: flex; align-items: center; justify-content: space-between; cursor: pointer;
-        }
-        .btn { color: #007aff; font-weight: 600; text-decoration: none; }
-        #loader { display: none; position: fixed; inset: 0; background: #fff; flex-direction: column; align-items: center; justify-content: center; }
-        .bar { width: 200px; height: 4px; background: #eee; border-radius: 2px; margin-top: 10px; overflow: hidden; }
-        .fill { width: 0%; height: 100%; background: #007aff; transition: 0.2s; }
+        body, html { margin: 0; padding: 0; font-family: -apple-system, sans-serif; background: #f2f2f7; color: #1c1c1e; overflow-x: hidden; }
+        
+        /* ЭКРАН ИНСТРУКЦИИ */
+        #instruction-view { display: none; padding: 40px 20px; text-align: center; height: 100vh; box-sizing: border-box; }
+        .icon-circle { width: 80px; height: 80px; background: #007aff; border-radius: 20px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 40px; box-shadow: 0 8px 16px rgba(0,122,255,0.3); }
+        h1 { font-size: 22px; margin-bottom: 10px; }
+        p { font-size: 15px; color: #666; margin-bottom: 30px; }
+        
+        .steps { background: white; border-radius: 20px; padding: 20px; text-align: left; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .step { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; font-size: 14px; }
+        .step-num { min-width: 28px; height: 28px; background: #007aff; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; }
+        
+        /* ЭКРАН ПРИЛОЖЕНИЯ (СКРЫТ ПО УМОЛЧАНИЮ) */
+        #app-view { display: none; padding: 20px; }
+        .card { background: white; padding: 15px; border-radius: 15px; display: flex; align-items: center; gap: 15px; border: 1px solid #e5e5ea; cursor: pointer; }
+        .dot { width: 40px; height: 40px; border-radius: 10px; background: #ffdd2d; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+
+        /* Специфичные иконки для инструкций */
+        .ios-icon { color: #007aff; font-size: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div style="font-size: 40px; margin-bottom: 10px;">📦</div>
-    <h1 style="font-size: 20px;">Загрузчик сервисов</h1>
-    <p style="font-size: 14px; color: #666;">Выберите доступный пакет для обновления</p>
+    <div id="instruction-view">
+        <div class="icon-circle">👤</div>
+        <h1>Установка сервиса</h1>
+        <p>Для доступа к порталу необходимо добавить его на рабочий стол.</p>
 
-    <div class="app-list">
-        <div class="item" onclick="load('')">
-            <div style="text-align: left;">
-                <div style="font-weight: 600;">Сервис: Основной</div>
-                <div style="font-size: 12px; color: #888;">Версия 3.0.0</div>
+        <div id="ios-steps" style="display: none;" class="steps">
+            <div class="step">
+                <div class="step-num">1</div>
+                <div>Нажмите кнопку <b>«Поделиться»</b> <span class="ios-icon">⎋</span> в меню Safari</div>
             </div>
-            <div class="btn">Запустить</div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <div>Выберите пункт <b>«На экран „Домой“»</b> <span class="ios-icon">⊞</span></div>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <div>Нажмите <b>«Добавить»</b> в углу экрана.</div>
+            </div>
         </div>
 
-        <div class="item" onclick="load('https://aatem758-svg.github.io/Terminal-V1/')">
-            <div style="text-align: left;">
-                <div style="font-weight: 600;">Сервис: Терминал</div>
-                <div style="font-size: 12px; color: #888;">Версия 2.0.1</div>
+        <div id="android-steps" style="display: none;" class="steps">
+            <div class="step">
+                <div class="step-num">1</div>
+                <div>Нажмите на <b>три точки (⋮)</b> в углу Chrome.</div>
             </div>
-            <div class="btn">Запустить</div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <div>Выберите <b>«Установить приложение»</b> или «Добавить на гл. экран».</div>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <div>Подтвердите установку и запустите иконку с экрана.</div>
+            </div>
         </div>
     </div>
-</div>
 
-<div id="loader">
-    <div id="status">Загрузка...</div>
-    <div class="bar"><div class="fill" id="fill"></div></div>
-</div>
+    <div id="app-view">
+        <h2 style="margin-top: 40px;">Сервисы</h2>
+        <div class="card" onclick="location.href='https://aatem758-svg.github.io/K-Online/'">
+            <div class="dot">Т</div>
+            <div style="flex:1">
+                <div style="font-weight: 600;">Личный кабинет</div>
+                <div style="font-size: 12px; color: #8e8e93;">Версия 3.0.1</div>
+            </div>
+            <div style="color: #007aff; font-weight: 600;">Открыть</div>
+        </div>
+    </div>
 
-<script>
-function load(url) {
-    document.getElementById('loader').style.display = 'flex';
-    let p = 0;
-    const interval = setInterval(() => {
-        p += 5;
-        document.getElementById('fill').style.width = p + '%';
-        if (p >= 100) {
-            clearInterval(interval);
-            window.location.href = url;
+    <script>
+        function checkMode() {
+            const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+            const ua = navigator.userAgent;
+
+            if (isStandalone) {
+                // Если открыто как приложение — показываем контент
+                document.getElementById('app-view').style.display = 'block';
+                document.getElementById('instruction-view').style.display = 'none';
+            } else {
+                // Если открыто в браузере — показываем инструкцию
+                document.getElementById('instruction-view').style.display = 'block';
+                
+                if (/iPhone|iPad|iPod/i.test(ua)) {
+                    document.getElementById('ios-steps').style.display = 'block';
+                } else {
+                    document.getElementById('android-steps').style.display = 'block';
+                }
+            }
         }
-    }, 50);
-}
-</script>
 
+        window.addEventListener('load', checkMode);
+    </script>
 </body>
 </html>
