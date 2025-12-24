@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>App-Personal</title>
+
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Установщик">
+    <meta name="theme-color" content="#ffffff">
+
+    <link rel="apple-touch-icon" href="https://via.placeholder.com/180/007aff/ffffff?text=P">
+    <link rel="icon" type="image/png" href="https://via.placeholder.com/180/007aff/ffffff?text=P">
+
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; font-family: -apple-system, sans-serif; background: #ffffff; color: #000; }
+        .container { padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center; }
+        .app-list { width: 100%; max-width: 400px; margin-top: 20px; }
+        .item { 
+            background: #f2f2f7; padding: 15px; border-radius: 12px; margin-bottom: 10px; 
+            display: flex; align-items: center; justify-content: space-between; cursor: pointer;
+        }
+        .btn { color: #007aff; font-weight: 600; text-decoration: none; }
+        #loader { display: none; position: fixed; inset: 0; background: #fff; flex-direction: column; align-items: center; justify-content: center; }
+        .bar { width: 200px; height: 4px; background: #eee; border-radius: 2px; margin-top: 10px; overflow: hidden; }
+        .fill { width: 0%; height: 100%; background: #007aff; transition: 0.2s; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div style="font-size: 40px; margin-bottom: 10px;">📦</div>
+    <h1 style="font-size: 20px;">Загрузчик сервисов</h1>
+    <p style="font-size: 14px; color: #666;">Выберите доступный пакет для обновления</p>
+
+    <div class="app-list">
+        <div class="item" onclick="load('')">
+            <div style="text-align: left;">
+                <div style="font-weight: 600;">Сервис: Основной</div>
+                <div style="font-size: 12px; color: #888;">Версия 3.0.0</div>
+            </div>
+            <div class="btn">Запустить</div>
+        </div>
+
+        <div class="item" onclick="load('https://aatem758-svg.github.io/Terminal-V1/')">
+            <div style="text-align: left;">
+                <div style="font-weight: 600;">Сервис: Терминал</div>
+                <div style="font-size: 12px; color: #888;">Версия 2.0.1</div>
+            </div>
+            <div class="btn">Запустить</div>
+        </div>
+    </div>
+</div>
+
+<div id="loader">
+    <div id="status">Загрузка...</div>
+    <div class="bar"><div class="fill" id="fill"></div></div>
+</div>
+
+<script>
+function load(url) {
+    document.getElementById('loader').style.display = 'flex';
+    let p = 0;
+    const interval = setInterval(() => {
+        p += 5;
+        document.getElementById('fill').style.width = p + '%';
+        if (p >= 100) {
+            clearInterval(interval);
+            window.location.href = url;
+        }
+    }, 50);
+}
+</script>
+
+</body>
+</html>
