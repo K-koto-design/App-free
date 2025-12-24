@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Системный Портал1</title>
+    <title>Free</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -43,6 +43,7 @@
         .dot { width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #000; font-size: 18px; }
         .bg-yellow { background: #ffdd2d; }
         .bg-blue { background: #007aff; color: white; }
+        .bg-black { background: #1c1c1e; color: #30d158; } /* Стиль для инвестиций */
         
         .app-info { flex: 1; }
         .app-name { font-weight: 600; font-size: 16px; }
@@ -90,8 +91,17 @@
         <div class="card" onclick="location.href='https://k-koto-design.github.io/Portal/'">
             <div class="dot bg-blue">А</div>
             <div class="app-info">
-                <div class="app-name">Реестр активов</div>
-                <div class="app-ver">Мониторинг данных • v1.2.0</div>
+                <div class="app-name">Реестр Данных</div>
+                <div class="app-ver">Для сотрудников • v1.2.0</div>
+            </div>
+            <div class="open-btn">Открыть</div>
+        </div>
+
+        <div class="card" onclick="location.href='https://k-koto-design.github.io/portfel/'">
+            <div class="dot bg-black">📈</div>
+            <div class="app-info">
+                <div class="app-name">Активы Онлайн</div>
+                <div class="app-ver">Торговый терминал • v1.0.0</div>
             </div>
             <div class="open-btn">Открыть</div>
         </div>
@@ -102,7 +112,6 @@
             const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
             const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-            // Если не iPhone — пускаем сразу. Если iPhone — только через standalone.
             if (!isIOS || isStandalone) {
                 document.getElementById('app-view').style.display = 'block';
                 document.getElementById('instruction-view').style.display = 'none';
