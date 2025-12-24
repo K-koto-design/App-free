@@ -1,0 +1,16 @@
+{
+  "name": "Free",
+  "short_name": "Free",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#007aff",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/512/007aff/ffffff?text=A",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
