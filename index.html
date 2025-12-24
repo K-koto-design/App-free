@@ -3,29 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Free</title>
+    <title>Системный Портал</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Free">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="apple-touch-icon" href="https://img.icons8.com/fluency/300/shield.png">
 
     <style>
         body, html { margin: 0; padding: 0; font-family: -apple-system, sans-serif; background: #f2f2f7; color: #1c1c1e; overflow-x: hidden; }
         
-        /* ЭКРАН ИНСТРУКЦИИ */
+        /* ЭКРАН ИНСТРУКЦИИ (iOS) */
         #instruction-view { display: none; padding: 40px 20px; text-align: center; height: 100vh; box-sizing: border-box; }
         .icon-circle { width: 80px; height: 80px; background: #007aff; border-radius: 20px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 40px; box-shadow: 0 8px 16px rgba(0,122,255,0.3); }
         h1 { font-size: 22px; margin-bottom: 10px; }
-        p { font-size: 15px; color: #666; margin-bottom: 30px; }
-        
         .steps { background: white; border-radius: 20px; padding: 20px; text-align: left; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .step { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; font-size: 14px; }
         .step-num { min-width: 28px; height: 28px; background: #007aff; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; }
         
-        /* ЭКРАН ПРИЛОЖЕНИЯ */
+        /* ГЛАВНЫЙ ЭКРАН */
         #app-view { display: none; padding: 20px; }
-        .card { background: white; padding: 15px; border-radius: 15px; display: flex; align-items: center; gap: 15px; border: 1px solid #e5e5ea; cursor: pointer; }
-        .dot { width: 40px; height: 40px; border-radius: 10px; background: #ffdd2d; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .section-title { margin: 40px 0 15px 5px; font-size: 22px; font-weight: 700; }
+        
+        .card { 
+            background: white; 
+            padding: 18px; 
+            border-radius: 20px; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            border: 1px solid #e5e5ea; 
+            cursor: pointer; 
+            margin-bottom: 12px;
+            transition: transform 0.1s;
+        }
+        .card:active { transform: scale(0.98); background: #fafafa; }
+        
+        .dot { width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #000; font-size: 18px; }
+        .bg-yellow { background: #ffdd2d; }
+        .bg-blue { background: #007aff; color: white; }
+        
+        .app-info { flex: 1; }
+        .app-name { font-weight: 600; font-size: 16px; }
+        .app-ver { font-size: 12px; color: #8e8e93; margin-top: 2px; }
+        .open-btn { color: #007aff; font-weight: 600; font-size: 14px; }
 
         .ios-icon { color: #007aff; font-size: 20px; font-weight: bold; }
     </style>
@@ -34,58 +56,59 @@
 
     <div id="instruction-view">
         <div class="icon-circle">👤</div>
-        <h1>Установка сервиса</h1>
-        <p>Для доступа к порталу необходимо добавить его на рабочий стол.</p>
+        <h1>Установка портала</h1>
+        <p style="color: #666; margin-bottom: 30px;">Добавьте сервис на рабочий стол для продолжения.</p>
 
-        <div id="ios-steps" style="display: none;" class="steps">
+        <div class="steps">
             <div class="step">
                 <div class="step-num">1</div>
-                <div>Нажмите кнопку <b>«Поделиться»</b> <span class="ios-icon">⎋</span> в меню Safari</div>
+                <div>Нажмите <b>«Поделиться»</b> <span class="ios-icon">⎋</span> в Safari</div>
             </div>
             <div class="step">
                 <div class="step-num">2</div>
-                <div>Выберите пункт <b>«На экран „Домой“»</b> <span class="ios-icon">⊞</span></div>
+                <div>Выберите <b>«На экран „Домой“»</b> <span class="ios-icon">⊞</span></div>
             </div>
             <div class="step">
                 <div class="step-num">3</div>
-                <div>Нажмите <b>«Добавить»</b> в углу экрана.</div>
+                <div>Нажмите <b>«Добавить»</b>.</div>
             </div>
         </div>
-        
-        </div>
+    </div>
 
     <div id="app-view">
-        <h2 style="margin-top: 40px;">Сервисы</h2>
+        <div class="section-title">Сервисы</div>
+        
         <div class="card" onclick="location.href='https://k-koto-design.github.io/Online/'">
-            <div class="dot">К</div>
-            <div style="flex:1">
-                <div style="font-weight: 600;">Личный кабинет</div>
-                <div style="font-size: 12px; color: #8e8e93;">Версия 3.0.1</div>
+            <div class="dot bg-yellow">К</div>
+            <div class="app-info">
+                <div class="app-name">Личный кабинет</div>
+                <div class="app-ver">Управление профилем • v3.0.1</div>
             </div>
+            <div class="open-btn">Открыть</div>
+        </div>
+
+        <div class="card" onclick="location.href='https://k-koto-design.github.io/Portal/'">
+            <div class="dot bg-blue">А</div>
+            <div class="app-info">
+                <div class="app-name">Реестр активов</div>
+                <div class="app-ver">Мониторинг данных • v1.2.0</div>
+            </div>
+            <div class="open-btn">Открыть</div>
+        </div>
     </div>
 
     <script>
         function checkMode() {
             const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
-            const ua = navigator.userAgent;
-            const isIOS = /iPhone|iPad|iPod/i.test(ua);
+            const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-            if (!isIOS) {
-                // Если это НЕ iOS (например, Android), пускаем сразу к сайту
+            // Если не iPhone — пускаем сразу. Если iPhone — только через standalone.
+            if (!isIOS || isStandalone) {
                 document.getElementById('app-view').style.display = 'block';
                 document.getElementById('instruction-view').style.display = 'none';
             } else {
-                // Если это iOS
-                if (isStandalone) {
-                    // Если iOS и уже добавлено на главный экран
-                    document.getElementById('app-view').style.display = 'block';
-                    document.getElementById('instruction-view').style.display = 'none';
-                } else {
-                    // Если iOS и просто браузер — требуем установку
-                    document.getElementById('instruction-view').style.display = 'block';
-                    document.getElementById('ios-steps').style.display = 'block';
-                    document.getElementById('app-view').style.display = 'none';
-                }
+                document.getElementById('instruction-view').style.display = 'block';
+                document.getElementById('app-view').style.display = 'none';
             }
         }
 
