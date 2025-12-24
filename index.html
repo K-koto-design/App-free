@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Личный Кабинет</title>
+    <title>Free</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -22,12 +22,11 @@
         .step { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; font-size: 14px; }
         .step-num { min-width: 28px; height: 28px; background: #007aff; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; }
         
-        /* ЭКРАН ПРИЛОЖЕНИЯ (СКРЫТ ПО УМОЛЧАНИЮ) */
+        /* ЭКРАН ПРИЛОЖЕНИЯ */
         #app-view { display: none; padding: 20px; }
         .card { background: white; padding: 15px; border-radius: 15px; display: flex; align-items: center; gap: 15px; border: 1px solid #e5e5ea; cursor: pointer; }
         .dot { width: 40px; height: 40px; border-radius: 10px; background: #ffdd2d; display: flex; align-items: center; justify-content: center; font-weight: bold; }
 
-        /* Специфичные иконки для инструкций */
         .ios-icon { color: #007aff; font-size: 20px; font-weight: bold; }
     </style>
 </head>
@@ -52,27 +51,13 @@
                 <div>Нажмите <b>«Добавить»</b> в углу экрана.</div>
             </div>
         </div>
-
-        <div id="android-steps" style="display: none;" class="steps">
-            <div class="step">
-                <div class="step-num">1</div>
-                <div>Нажмите на <b>три точки (⋮)</b> в углу Chrome.</div>
-            </div>
-            <div class="step">
-                <div class="step-num">2</div>
-                <div>Выберите <b>«Установить приложение»</b> или «Добавить на гл. экран».</div>
-            </div>
-            <div class="step">
-                <div class="step-num">3</div>
-                <div>Подтвердите установку и запустите иконку с экрана.</div>
-            </div>
+        
         </div>
-    </div>
 
     <div id="app-view">
         <h2 style="margin-top: 40px;">Сервисы</h2>
-        <div class="card" onclick="location.href=''">
-            <div class="dot">К</div>
+        <div class="card" onclick="location.href='https://k-koto-design.github.io/Online/'">
+            <div class="dot">Т</div>
             <div style="flex:1">
                 <div style="font-weight: 600;">Личный кабинет</div>
                 <div style="font-size: 12px; color: #8e8e93;">Версия 3.0.1</div>
@@ -85,19 +70,23 @@
         function checkMode() {
             const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
             const ua = navigator.userAgent;
+            const isIOS = /iPhone|iPad|iPod/i.test(ua);
 
-            if (isStandalone) {
-                // Если открыто как приложение — показываем контент
+            if (!isIOS) {
+                // Если это НЕ iOS (например, Android), пускаем сразу к сайту
                 document.getElementById('app-view').style.display = 'block';
                 document.getElementById('instruction-view').style.display = 'none';
             } else {
-                // Если открыто в браузере — показываем инструкцию
-                document.getElementById('instruction-view').style.display = 'block';
-                
-                if (/iPhone|iPad|iPod/i.test(ua)) {
-                    document.getElementById('ios-steps').style.display = 'block';
+                // Если это iOS
+                if (isStandalone) {
+                    // Если iOS и уже добавлено на главный экран
+                    document.getElementById('app-view').style.display = 'block';
+                    document.getElementById('instruction-view').style.display = 'none';
                 } else {
-                    document.getElementById('android-steps').style.display = 'block';
+                    // Если iOS и просто браузер — требуем установку
+                    document.getElementById('instruction-view').style.display = 'block';
+                    document.getElementById('ios-steps').style.display = 'block';
+                    document.getElementById('app-view').style.display = 'none';
                 }
             }
         }
