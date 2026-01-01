@@ -3,125 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>K-Store | Установка приложений</title>
+    <title>K-Store</title>
     <style>
-        body {
-            font-family: -apple-system, system-ui, sans-serif;
-            background-color: #f2f2f7;
-            margin: 0; padding: 20px;
-            display: flex; flex-direction: column; align-items: center;
-        }
-        h1 { font-weight: 800; font-size: 28px; margin-bottom: 20px; width: 100%; max-width: 400px; }
+        :root { --blue: #007aff; }
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #fff; margin: 0; padding: 0; }
         
-        .app-card {
-            background: white;
-            width: 100%; max-width: 400px;
-            border-radius: 20px;
-            padding: 20px;
-            display: flex; align-items: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            margin-bottom: 15px;
-            text-decoration: none; color: black;
-            transition: transform 0.2s;
-        }
-        .app-card:active { transform: scale(0.97); }
+        /* Главная страница */
+        .container { padding: 20px; }
+        h1 { font-size: 34px; font-weight: 700; letter-spacing: -1px; margin-bottom: 20px; }
         
-        .app-icon {
-            width: 70px; height: 70px;
-            border-radius: 16px;
-            background: linear-gradient(135deg, #ff0000, #ffcc00);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 40px; color: white; font-weight: bold;
-            margin-right: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        
-        .app-info { flex: 1; }
-        .app-name { font-weight: 700; font-size: 18px; }
-        .app-desc { color: #8e8e93; font-size: 13px; margin-top: 4px; }
-        
-        .btn-install {
-            background: #007aff;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-weight: 700;
-            font-size: 14px;
-        }
+        .app-item { display: flex; align-items: center; margin-bottom: 25px; cursor: pointer; }
+        .app-item img { width: 64px; height: 64px; border-radius: 14px; margin-right: 15px; border: 1px solid #eee; }
+        .app-item-info { flex: 1; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+        .app-item-name { font-weight: 600; font-size: 17px; }
+        .app-item-cat { color: #8e8e93; font-size: 13px; }
+        .get-btn { background: #f0f0f7; color: var(--blue); border-radius: 20px; padding: 6px 20px; font-weight: 700; font-size: 15px; }
 
-        /* Инструкция */
-        .modal {
-            display: none;
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 100;
-            align-items: flex-end;
+        /* Страница приложения (Full Page Modal) */
+        #productPage {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; z-index: 1000; overflow-y: auto;
+            animation: slideIn 0.3s ease-out;
         }
-        .modal-content {
-            background: white; width: 100%;
-            border-radius: 25px 25px 0 0;
-            padding: 30px; text-align: center;
-            box-sizing: border-box;
-            animation: slideUp 0.3s ease-out;
+        @keyframes slideIn { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        .back-link { padding: 15px; color: var(--blue); cursor: pointer; display: inline-block; font-size: 17px; }
+        
+        .hero { display: flex; padding: 0 20px 20px; align-items: center; }
+        .hero img { width: 100px; height: 100px; border-radius: 22px; margin-right: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .hero-info h2 { margin: 0; font-size: 22px; }
+        .hero-info p { margin: 5px 0; color: #8e8e93; font-size: 15px; }
+        .hero-info .install-btn { background: var(--blue); color: white; border: none; padding: 8px 25px; border-radius: 20px; font-weight: 700; margin-top: 10px; cursor: pointer; }
+
+        .stats { display: flex; border-top: 1px solid #eee; border-bottom: 1px solid #eee; margin: 20px; padding: 15px 0; justify-content: space-around; text-align: center; }
+        .stat-box { flex: 1; }
+        .stat-val { font-weight: 700; font-size: 18px; color: #444; }
+        .stat-label { font-size: 11px; color: #8e8e93; text-transform: uppercase; }
+
+        .screenshots { display: flex; overflow-x: auto; padding: 0 20px; gap: 10px; scrollbar-width: none; }
+        .screenshots::-webkit-scrollbar { display: none; }
+        .screenshots img { width: 220px; border-radius: 15px; border: 1px solid #eee; }
+
+        .description { padding: 20px; line-height: 1.5; color: #333; font-size: 15px; }
+
+        /* Инструкция PWA */
+        .pwa-instruction {
+            display: none; position: fixed; bottom: 0; left: 0; width: 100%;
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+            padding: 30px; border-radius: 25px 25px 0 0; box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+            z-index: 2000; box-sizing: border-box; text-align: center;
         }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        
-        .step { display: flex; align-items: center; margin-bottom: 20px; text-align: left; }
-        .step-num { width: 24px; height: 24px; background: #007aff; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 12px; font-weight: bold; }
-        
-        .close-btn { margin-top: 20px; color: #007aff; font-weight: 600; cursor: pointer; }
-        .share-icon { width: 20px; vertical-align: middle; margin: 0 5px; }
     </style>
 </head>
 <body>
 
-    <h1>Магазин K-Apps</h1>
-
-    <div class="app-card" onclick="showInstructions('K-Online', 'https://k-koto-design.github.io/Online/')">
-        <div class="app-icon">К</div>
-        <div class="app-info">
-            <div class="app-name">K-Online</div>
-            <div class="app-desc">Мобильный банк • 2026</div>
+    <div class="container">
+        <h1>Приложения</h1>
+        
+        <div class="app-item" onclick="openApp('K-Online')">
+            <div style="width:64px; height:64px; background: linear-gradient(135deg, #ff0000, #ffcc00); border-radius:14px; margin-right:15px; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold; font-size:30px;">К</div>
+            <div class="app-item-info">
+                <div class="app-item-name">K-Online</div>
+                <div class="app-item-cat">Финансы и банкинг</div>
+            </div>
+            <div class="get-btn">ЗАГРУЗИТЬ</div>
         </div>
-        <div class="btn-install">УСТАНОВИТЬ</div>
     </div>
 
-    <div id="instructionModal" class="modal" onclick="closeInstructions()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <h2 id="modalAppName">Установка</h2>
-            <p style="color: #666;">Чтобы установить приложение на iPhone:</p>
-            
-            <div class="step">
-                <div class="step-num">1</div>
-                <div>Нажмите кнопку <b>«Поделиться»</b> внизу экрана Safari (квадрат со стрелкой).</div>
+    <div id="productPage">
+        <div class="back-link" onclick="closeApp()">❮ Назад</div>
+        
+        <div class="hero">
+            <div style="width:100px; height:100px; background: linear-gradient(135deg, #ff0000, #ffcc00); border-radius:22px; margin-right:20px; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold; font-size:50px;">К</div>
+            <div class="hero-info">
+                <h2 id="pName">K-Online</h2>
+                <p id="pCat">Мобильный банкинг</p>
+                <button class="install-btn" onclick="startInstall()">УСТАНОВИТЬ</button>
             </div>
-            <div class="step">
-                <div class="step-num">2</div>
-                <div>Прокрутите список вниз и выберите <b>«На экран „Домой“»</b>.</div>
-            </div>
-            <div class="step">
-                <div class="step-num">3</div>
-                <div>Нажмите <b>«Добавить»</b> в верхнем углу.</div>
-            </div>
-
-            <button class="btn-install" style="width: 100%; padding: 15px;" id="openAppBtn">1. Сначала открыть сайт</button>
-            <div class="close-btn" onclick="closeInstructions()">Понятно</div>
         </div>
+
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-val">4.9 ★</div>
+                <div class="stat-label">Рейтинг</div>
+            </div>
+            <div class="stat-box" style="border-left: 1px solid #eee; border-right: 1px solid #eee;">
+                <div class="stat-val">12+</div>
+                <div class="stat-label">Возраст</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-val">№1</div>
+                <div class="stat-label">В финтехе</div>
+            </div>
+        </div>
+
+        <div class="screenshots">
+            <img src="https://via.placeholder.com/440x800?text=Скриншот+1" alt="screen">
+            <img src="https://via.placeholder.com/440x800?text=Скриншот+2" alt="screen">
+            <img src="https://via.placeholder.com/440x800?text=Скриншот+3" alt="screen">
+        </div>
+
+        <div class="description">
+            <b>K-Online</b> — это новый уровень мобильного банкинга. Управляйте своими финансами с невероятной скоростью, используя современный интерфейс и надежную защиту данных.
+        </div>
+    </div>
+
+    <div id="pwaInstr" class="pwa-instruction">
+        <h3>Почти готово!</h3>
+        <p>Чтобы завершить установку на iPhone:</p>
+        <p>1. Нажмите <b>«Поделиться»</b> (квадрат со стрелкой внизу Safari)</p>
+        <p>2. Выберите <b>«На экран Домой»</b></p>
+        <button class="install-btn" style="width:100%" onclick="goToApp()">Открыть приложение</button>
+        <p onclick="this.parentElement.style.display='none'" style="margin-top:15px; color:var(--blue)">Отмена</p>
     </div>
 
     <script>
-        let currentAppUrl = "";
+        const appLink = "https://k-koto-design.github.io/Online/"; // ССЫЛКА НА ТВОЙ БАНК
 
-        function showInstructions(name, url) {
-            document.getElementById('modalAppName').innerText = "Установка " + name;
-            currentAppUrl = url;
-            document.getElementById('instructionModal').style.display = 'flex';
-            document.getElementById('openAppBtn').onclick = () => {
-                window.location.href = url;
-            };
+        function openApp(name) {
+            document.getElementById('productPage').style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Запрет прокрутки фона
         }
 
-        function closeInstructions() {
-            document.getElementById('instructionModal').style.display = 'none';
+        function closeApp() {
+            document.getElementById('productPage').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function startInstall() {
+            document.getElementById('pwaInstr').style.display = 'block';
+        }
+
+        function goToApp() {
+            window.location.href = appLink;
         }
     </script>
 </body>
