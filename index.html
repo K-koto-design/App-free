@@ -1,142 +1,210 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>K-Store</title>
-    <style>
-        :root { --blue: #007aff; }
-        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #fff; margin: 0; padding: 0; }
-        
-        /* Главная страница */
-        .container { padding: 20px; }
-        h1 { font-size: 34px; font-weight: 700; letter-spacing: -1px; margin-bottom: 20px; }
-        
-        .app-item { display: flex; align-items: center; margin-bottom: 25px; cursor: pointer; }
-        .app-item img { width: 64px; height: 64px; border-radius: 14px; margin-right: 15px; border: 1px solid #eee; }
-        .app-item-info { flex: 1; border-bottom: 1px solid #eee; padding-bottom: 15px; }
-        .app-item-name { font-weight: 600; font-size: 17px; }
-        .app-item-cat { color: #8e8e93; font-size: 13px; }
-        .get-btn { background: #f0f0f7; color: var(--blue); border-radius: 20px; padding: 6px 20px; font-weight: 700; font-size: 15px; }
+<meta charset="UTF-8">
+<title>PWA Store</title>
 
-        /* Страница приложения (Full Page Modal) */
-        #productPage {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: white; z-index: 1000; overflow-y: auto;
-            animation: slideIn 0.3s ease-out;
-        }
-        @keyframes slideIn { from { transform: translateY(100%); } to { transform: translateY(0); } }
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0a84ff">
 
-        .back-link { padding: 15px; color: var(--blue); cursor: pointer; display: inline-block; font-size: 17px; }
-        
-        .hero { display: flex; padding: 0 20px 20px; align-items: center; }
-        .hero img { width: 100px; height: 100px; border-radius: 22px; margin-right: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .hero-info h2 { margin: 0; font-size: 22px; }
-        .hero-info p { margin: 5px 0; color: #8e8e93; font-size: 15px; }
-        .hero-info .install-btn { background: var(--blue); color: white; border: none; padding: 8px 25px; border-radius: 20px; font-weight: 700; margin-top: 10px; cursor: pointer; }
+<!-- iOS -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PWA Store">
 
-        .stats { display: flex; border-top: 1px solid #eee; border-bottom: 1px solid #eee; margin: 20px; padding: 15px 0; justify-content: space-around; text-align: center; }
-        .stat-box { flex: 1; }
-        .stat-val { font-weight: 700; font-size: 18px; color: #444; }
-        .stat-label { font-size: 11px; color: #8e8e93; text-transform: uppercase; }
+<link rel="manifest" href="manifest.json">
 
-        .screenshots { display: flex; overflow-x: auto; padding: 0 20px; gap: 10px; scrollbar-width: none; }
-        .screenshots::-webkit-scrollbar { display: none; }
-        .screenshots img { width: 220px; border-radius: 15px; border: 1px solid #eee; }
+<style>
+* { box-sizing: border-box; }
 
-        .description { padding: 20px; line-height: 1.5; color: #333; font-size: 15px; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+  background: #f5f5f7;
+}
 
-        /* Инструкция PWA */
-        .pwa-instruction {
-            display: none; position: fixed; bottom: 0; left: 0; width: 100%;
-            background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
-            padding: 30px; border-radius: 25px 25px 0 0; box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
-            z-index: 2000; box-sizing: border-box; text-align: center;
-        }
-    </style>
+/* HEADER */
+header {
+  padding: 14px 16px;
+  background: white;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.08);
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+}
+
+header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+header input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+}
+
+button {
+  background: #0a84ff;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 600;
+}
+
+/* GRID */
+main {
+  padding: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.app {
+  background: white;
+  border-radius: 18px;
+  padding: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.08);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.app img {
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;
+  object-fit: cover;
+}
+
+.rating { color: #ffb400; }
+
+/* MODAL */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.4);
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 18px;
+  padding: 16px;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+input, textarea {
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+}
+</style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Приложения</h1>
-        
-        <div class="app-item" onclick="openApp('K-Online')">
-            <div style="width:64px; height:64px; background: linear-gradient(135deg, #ff0000, #ffcc00); border-radius:14px; margin-right:15px; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold; font-size:30px;">К</div>
-            <div class="app-item-info">
-                <div class="app-item-name">K-Online</div>
-                <div class="app-item-cat">Финансы и банкинг</div>
-            </div>
-            <div class="get-btn">ЗАГРУЗИТЬ</div>
-        </div>
-    </div>
+<header>
+  <!-- SVG LOGO -->
+  <svg class="logo" viewBox="0 0 100 100">
+    <defs>
+      <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#0a84ff"/>
+        <stop offset="100%" stop-color="#5e5ce6"/>
+      </linearGradient>
+    </defs>
+    <rect x="10" y="10" width="80" height="80" rx="22" fill="url(#g)"/>
+    <path d="M35 50h30M50 35v30" stroke="#fff" stroke-width="8" stroke-linecap="round"/>
+  </svg>
 
-    <div id="productPage">
-        <div class="back-link" onclick="closeApp()">❮ Назад</div>
-        
-        <div class="hero">
-            <div style="width:100px; height:100px; background: linear-gradient(135deg, #ff0000, #ffcc00); border-radius:22px; margin-right:20px; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold; font-size:50px;">К</div>
-            <div class="hero-info">
-                <h2 id="pName">K-Online</h2>
-                <p id="pCat">Мобильный банкинг</p>
-                <button class="install-btn" onclick="startInstall()">УСТАНОВИТЬ</button>
-            </div>
-        </div>
+  <h2>PWA Store</h2>
+  <input placeholder="Поиск" oninput="search(this.value)">
+  <button onclick="openModal()">＋</button>
+</header>
 
-        <div class="stats">
-            <div class="stat-box">
-                <div class="stat-val">4.9 ★</div>
-                <div class="stat-label">Рейтинг</div>
-            </div>
-            <div class="stat-box" style="border-left: 1px solid #eee; border-right: 1px solid #eee;">
-                <div class="stat-val">12+</div>
-                <div class="stat-label">Возраст</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-val">№1</div>
-                <div class="stat-label">В финтехе</div>
-            </div>
-        </div>
+<main id="apps"></main>
 
-        <div class="screenshots">
-            <img src="https://via.placeholder.com/440x800?text=Скриншот+1" alt="screen">
-            <img src="https://via.placeholder.com/440x800?text=Скриншот+2" alt="screen">
-            <img src="https://via.placeholder.com/440x800?text=Скриншот+3" alt="screen">
-        </div>
+<!-- ADD APP -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <h3>Добавить PWA</h3>
+    <input id="name" placeholder="Название">
+    <textarea id="desc" placeholder="Описание"></textarea>
+    <input id="icon" placeholder="URL иконки">
+    <input id="screens" placeholder="Скрины (через ,)">
+    <input id="url" placeholder="URL PWA">
+    <input id="rating" type="number" min="1" max="5" placeholder="Рейтинг">
+    <button onclick="saveApp()">Сохранить</button>
+    <button onclick="closeModal()" style="background:#aaa">Отмена</button>
+  </div>
+</div>
 
-        <div class="description">
-            <b>K-Online</b> — это новый уровень мобильного банкинга. Управляйте своими финансами с невероятной скоростью, используя современный интерфейс и надежную защиту данных.
-        </div>
-    </div>
+<script>
+let apps = JSON.parse(localStorage.getItem("apps") || "[]")
+const appsEl = document.getElementById("apps")
+const modal = document.getElementById("modal")
 
-    <div id="pwaInstr" class="pwa-instruction">
-        <h3>Почти готово!</h3>
-        <p>Чтобы завершить установку на iPhone:</p>
-        <p>1. Нажмите <b>«Поделиться»</b> (квадрат со стрелкой внизу Safari)</p>
-        <p>2. Выберите <b>«На экран Домой»</b></p>
-        <button class="install-btn" style="width:100%" onclick="goToApp()">Открыть приложение</button>
-        <p onclick="this.parentElement.style.display='none'" style="margin-top:15px; color:var(--blue)">Отмена</p>
-    </div>
+function openModal(){ modal.style.display="flex" }
+function closeModal(){ modal.style.display="none" }
 
-    <script>
-        const appLink = "https://k-koto-design.github.io/Online/"; // ССЫЛКА НА ТВОЙ БАНК
+function saveApp(){
+  if(!name.value || !url.value) return alert("Название и URL обязательны")
+  apps.push({
+    id: Date.now(),
+    name: name.value,
+    desc: desc.value,
+    icon: icon.value,
+    screens: screens.value.split(",").filter(Boolean),
+    url: url.value,
+    rating: rating.value || 0
+  })
+  localStorage.setItem("apps", JSON.stringify(apps))
+  closeModal()
+  render(apps)
+}
 
-        function openApp(name) {
-            document.getElementById('productPage').style.display = 'block';
-            document.body.style.overflow = 'hidden'; // Запрет прокрутки фона
-        }
+function render(list){
+  appsEl.innerHTML=""
+  list.forEach(app=>{
+    const el=document.createElement("div")
+    el.className="app"
+    el.innerHTML=`
+      <img src="${app.icon||'https://via.placeholder.com/72'}">
+      <b>${app.name}</b>
+      <small>${app.desc||""}</small>
+      <div class="rating">${"★".repeat(app.rating)}</div>
+      <button onclick="openApp('${app.url}')">Открыть / Установить</button>
+    `
+    appsEl.appendChild(el)
+  })
+}
 
-        function closeApp() {
-            document.getElementById('productPage').style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
+function openApp(url){ window.open(url,"_blank") }
 
-        function startInstall() {
-            document.getElementById('pwaInstr').style.display = 'block';
-        }
+function search(q){
+  q=q.toLowerCase()
+  render(apps.filter(a=>a.name.toLowerCase().includes(q)))
+}
 
-        function goToApp() {
-            window.location.href = appLink;
-        }
-    </script>
+render(apps)
+
+/* SERVICE WORKER */
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("sw.js")
+}
+</script>
+
 </body>
 </html>
