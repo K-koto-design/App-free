@@ -186,6 +186,10 @@ function openApp(url) {
   window.location.href = url;
 }
 </script>
-
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js');
+}
+</script>
 </body>
 </html>
