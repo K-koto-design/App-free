@@ -155,7 +155,11 @@ function checkIfInstalled() {
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches
                        || window.navigator.standalone === true;
 
-  if (isStandalone) {
+  // сохраняем флаг в localStorage
+  if (isStandalone) localStorage.setItem('pwaInstalled', 'true');
+
+  // показываем магазин, если standalone или уже установлен ранее
+  if (isStandalone || localStorage.getItem('pwaInstalled') === 'true') {
     installScreen.classList.add('hidden');
     store.classList.remove('hidden');
     renderApps();
@@ -165,7 +169,7 @@ function checkIfInstalled() {
   }
 }
 
-/* ================= APPRENDER ================= */
+/* ================= RENDER APPS ================= */
 function renderApps() {
   appsContainer.innerHTML = '';
   APPS.forEach(app => {
