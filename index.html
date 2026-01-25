@@ -2,207 +2,188 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>PWA Store</title>
+<title>Mini App Store</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#0a84ff">
-
-<!-- iOS -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="PWA Store">
-
+<!-- PWA -->
 <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-capable" content="yes">
 
 <style>
-* { box-sizing: border-box; }
-
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont;
-  background: #f5f5f7;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #f2f2f7;
 }
 
-/* HEADER */
-header {
-  padding: 14px 16px;
-  background: white;
+.hidden { display: none; }
+
+/* INSTALL SCREEN */
+#install {
+  height: 100vh;
   display: flex;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  gap: 12px;
-  box-shadow: 0 2px 12px rgba(0,0,0,.08);
+  text-align: center;
 }
 
-.logo {
-  width: 40px;
-  height: 40px;
-}
-
-header h2 {
-  margin: 0;
-  font-size: 18px;
-}
-
-header input {
-  flex: 1;
-  padding: 10px;
-  border-radius: 12px;
-  border: 1px solid #ddd;
+#install img {
+  width: 120px;
+  border-radius: 26px;
 }
 
 button {
-  background: #0a84ff;
+  background: #007aff;
   color: white;
   border: none;
-  border-radius: 12px;
-  padding: 10px 14px;
-  font-weight: 600;
+  padding: 14px 32px;
+  border-radius: 22px;
+  font-size: 16px;
 }
 
-/* GRID */
-main {
-  padding: 16px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 16px;
+#apk {
+  display: none;
+  margin-top: 15px;
+  color: green;
+  text-decoration: none;
+}
+
+/* STORE */
+#store {
+  padding: 20px;
+}
+
+.header {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 20px;
 }
 
 .app {
   background: white;
-  border-radius: 18px;
-  padding: 12px;
-  box-shadow: 0 6px 20px rgba(0,0,0,.08);
+  border-radius: 20px;
+  padding: 15px;
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  margin-bottom: 15px;
 }
 
 .app img {
-  width: 72px;
-  height: 72px;
-  border-radius: 16px;
-  object-fit: cover;
-}
-
-.rating { color: #ffb400; }
-
-/* MODAL */
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.4);
-  display: none;
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-content {
-  background: white;
+  width: 80px;
+  height: 80px;
   border-radius: 18px;
-  padding: 16px;
-  width: 100%;
-  max-width: 420px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-input, textarea {
-  padding: 10px;
-  border-radius: 12px;
-  border: 1px solid #ddd;
+  margin-right: 15px;
 }
 </style>
 </head>
+
 <body>
 
-<header>
-  <!-- SVG LOGO -->
-  <svg class="logo" viewBox="0 0 100 100">
-    <defs>
-      <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stop-color="#0a84ff"/>
-        <stop offset="100%" stop-color="#5e5ce6"/>
-      </linearGradient>
-    </defs>
-    <rect x="10" y="10" width="80" height="80" rx="22" fill="url(#g)"/>
-    <path d="M35 50h30M50 35v30" stroke="#fff" stroke-width="8" stroke-linecap="round"/>
-  </svg>
+<!-- INSTALL -->
+<div id="install">
+  <img src="icon.png">
+  <h2>Установите приложение</h2>
+  <p id="platformText"></p>
+  <button id="installBtn">Установить</button>
+  <a id="apk" href="app.apk" download>Скачать APK</a>
+</div>
 
-  <h2>PWA Store</h2>
-  <input placeholder="Поиск" oninput="search(this.value)">
-  <button onclick="openModal()">＋</button>
-</header>
-
-<main id="apps"></main>
-
-<!-- ADD APP -->
-<div class="modal" id="modal">
-  <div class="modal-content">
-    <h3>Добавить PWA</h3>
-    <input id="name" placeholder="Название">
-    <textarea id="desc" placeholder="Описание"></textarea>
-    <input id="icon" placeholder="URL иконки">
-    <input id="screens" placeholder="Скрины (через ,)">
-    <input id="url" placeholder="URL PWA">
-    <input id="rating" type="number" min="1" max="5" placeholder="Рейтинг">
-    <button onclick="saveApp()">Сохранить</button>
-    <button onclick="closeModal()" style="background:#aaa">Отмена</button>
-  </div>
+<!-- STORE -->
+<div id="store" class="hidden">
+  <div class="header">Приложения</div>
+  <div id="apps"></div>
 </div>
 
 <script>
-let apps = JSON.parse(localStorage.getItem("apps") || "[]")
-const appsEl = document.getElementById("apps")
-const modal = document.getElementById("modal")
+/* ================= НАСТРОЙКИ ================= */
 
-function openModal(){ modal.style.display="flex" }
-function closeModal(){ modal.style.display="none" }
+const APPS = [
+  {
+    name: "My App",
+    description: "Описание приложения",
+    icon: "icon.png",
+    url: "https://your-pwa-site.com"
+  },
+  {
+    name: "Second App",
+    description: "Второе приложение",
+    icon: "icon.png",
+    url: "https://example.com"
+  }
+];
 
-function saveApp(){
-  if(!name.value || !url.value) return alert("Название и URL обязательны")
-  apps.push({
-    id: Date.now(),
-    name: name.value,
-    desc: desc.value,
-    icon: icon.value,
-    screens: screens.value.split(",").filter(Boolean),
-    url: url.value,
-    rating: rating.value || 0
-  })
-  localStorage.setItem("apps", JSON.stringify(apps))
-  closeModal()
-  render(apps)
+/* ================= PLATFORM ================= */
+
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const isAndroid = /android/i.test(navigator.userAgent);
+const isPWA =
+  window.matchMedia('(display-mode: standalone)').matches ||
+  window.navigator.standalone === true;
+
+const install = document.getElementById('install');
+const store = document.getElementById('store');
+const appsContainer = document.getElementById('apps');
+const installBtn = document.getElementById('installBtn');
+const apk = document.getElementById('apk');
+const platformText = document.getElementById('platformText');
+
+let deferredPrompt = null;
+
+/* ================= UI LOGIC ================= */
+
+if (isIOS) {
+  platformText.innerHTML = 'Поделиться → <b>На экран «Домой»</b>';
+  installBtn.style.display = 'none';
 }
 
-function render(list){
-  appsEl.innerHTML=""
-  list.forEach(app=>{
-    const el=document.createElement("div")
-    el.className="app"
-    el.innerHTML=`
-      <img src="${app.icon||'https://via.placeholder.com/72'}">
-      <b>${app.name}</b>
-      <small>${app.desc||""}</small>
-      <div class="rating">${"★".repeat(app.rating)}</div>
-      <button onclick="openApp('${app.url}')">Открыть / Установить</button>
-    `
-    appsEl.appendChild(el)
-  })
+if (isAndroid) {
+  platformText.innerText = 'Установите PWA или скачайте APK';
+  apk.style.display = 'block';
 }
 
-function openApp(url){ window.open(url,"_blank") }
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+});
 
-function search(q){
-  q=q.toLowerCase()
-  render(apps.filter(a=>a.name.toLowerCase().includes(q)))
+installBtn.onclick = async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+  deferredPrompt = null;
+};
+
+/* ================= BLOCK UNTIL INSTALL ================= */
+
+if (isPWA) {
+  install.classList.add('hidden');
+  store.classList.remove('hidden');
+  renderApps();
 }
 
-render(apps)
+/* ================= RENDER APPS ================= */
 
-/* SERVICE WORKER */
-if("serviceWorker" in navigator){
-  navigator.serviceWorker.register("sw.js")
+function renderApps() {
+  appsContainer.innerHTML = '';
+
+  APPS.forEach(app => {
+    const div = document.createElement('div');
+    div.className = 'app';
+    div.innerHTML = `
+      <img src="${app.icon}">
+      <div>
+        <h3>${app.name}</h3>
+        <p>${app.description}</p>
+        <button onclick="openApp('${app.url}')">Открыть</button>
+      </div>
+    `;
+    appsContainer.appendChild(div);
+  });
+}
+
+function openApp(url) {
+  window.location.href = url;
 }
 </script>
 
