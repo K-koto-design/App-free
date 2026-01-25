@@ -41,6 +41,7 @@ button {
   padding: 14px 32px;
   border-radius: 22px;
   font-size: 16px;
+  cursor: pointer;
 }
 
 #apk {
@@ -80,7 +81,7 @@ button {
 
 <body>
 
-<!-- INSTALL -->
+<!-- INSTALL SCREEN -->
 <div id="install">
   <img src="icon.png">
   <h2>Установите приложение</h2>
@@ -97,7 +98,6 @@ button {
 
 <script>
 /* ================= НАСТРОЙКИ ================= */
-
 const APPS = [
   {
     name: "My App",
@@ -114,14 +114,10 @@ const APPS = [
 ];
 
 /* ================= PLATFORM ================= */
-
 const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
 const isAndroid = /android/i.test(navigator.userAgent);
-const isPWA =
-  window.matchMedia('(display-mode: standalone)').matches ||
-  window.navigator.standalone === true;
 
-const install = document.getElementById('install');
+const installScreen = document.getElementById('install');
 const store = document.getElementById('store');
 const appsContainer = document.getElementById('apps');
 const installBtn = document.getElementById('installBtn');
@@ -130,10 +126,9 @@ const platformText = document.getElementById('platformText');
 
 let deferredPrompt = null;
 
-/* ================= UI LOGIC ================= */
-
+/* ================= PLATFORM TEXT ================= */
 if (isIOS) {
-  platformText.innerHTML = 'Поделиться → <b>На экран «Домой»</b>';
+  platformText.innerHTML = 'Нажмите <b>Поделиться</b> → <b>На экран «Домой»</b>';
   installBtn.style.display = 'none';
 }
 
@@ -142,6 +137,7 @@ if (isAndroid) {
   apk.style.display = 'block';
 }
 
+/* ================= INSTALL PROMPT ================= */
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   deferredPrompt = e;
@@ -154,19 +150,24 @@ installBtn.onclick = async () => {
   deferredPrompt = null;
 };
 
-/* ================= BLOCK UNTIL INSTALL ================= */
+/* ================= CHECK IF PWA ================= */
+function checkIfInstalled() {
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+                       || window.navigator.standalone === true;
 
-if (isPWA) {
-  install.classList.add('hidden');
-  store.classList.remove('hidden');
-  renderApps();
+  if (isStandalone) {
+    installScreen.classList.add('hidden');
+    store.classList.remove('hidden');
+    renderApps();
+  } else {
+    installScreen.classList.remove('hidden');
+    store.classList.add('hidden');
+  }
 }
 
-/* ================= RENDER APPS ================= */
-
+/* ================= APPRENDER ================= */
 function renderApps() {
   appsContainer.innerHTML = '';
-
   APPS.forEach(app => {
     const div = document.createElement('div');
     div.className = 'app';
@@ -185,11 +186,18 @@ function renderApps() {
 function openApp(url) {
   window.location.href = url;
 }
-</script>
-<script>
+
+/* ================= EVENTS ================= */
+window.addEventListener('load', checkIfInstalled);
+window.addEventListener('appinstalled', checkIfInstalled);
+
+/* ================= SERVICE WORKER ================= */
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js');
+  navigator.serviceWorker.register('./sw.js')
+    .then(() => console.log('Service Worker зарегистрирован'))
+    .catch(err => console.log('Ошибка SW:', err));
 }
 </script>
+
 </body>
 </html>
