@@ -2,205 +2,151 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Mini App Store</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- PWA -->
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#ffffff">
-<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Погода</title>
 
 <style>
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #f2f2f7;
-}
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+    }
 
-.hidden { display: none; }
+    body {
+        background: linear-gradient(135deg, #4facfe, #00f2fe);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+    }
 
-/* INSTALL SCREEN */
-#install {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
+    .weather-container {
+        background: rgba(255,255,255,0.15);
+        backdrop-filter: blur(10px);
+        padding: 30px;
+        border-radius: 20px;
+        width: 320px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
 
-#install img {
-  width: 120px;
-  border-radius: 26px;
-}
+    .city {
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
 
-button {
-  background: #007aff;
-  color: white;
-  border: none;
-  padding: 14px 32px;
-  border-radius: 22px;
-  font-size: 16px;
-  cursor: pointer;
-}
+    .temp {
+        font-size: 60px;
+        font-weight: bold;
+        margin: 10px 0;
+    }
 
-#apk {
-  display: none;
-  margin-top: 15px;
-  color: green;
-  text-decoration: none;
-}
+    .desc {
+        font-size: 20px;
+        margin-bottom: 20px;
+        opacity: 0.9;
+    }
 
-/* STORE */
-#store {
-  padding: 20px;
-}
+    .details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-top: 20px;
+    }
 
-.header {
-  font-size: 28px;
-  font-weight: 700;
-  margin-bottom: 20px;
-}
+    .card {
+        background: rgba(255,255,255,0.2);
+        padding: 15px;
+        border-radius: 15px;
+    }
 
-.app {
-  background: white;
-  border-radius: 20px;
-  padding: 15px;
-  display: flex;
-  margin-bottom: 15px;
-}
+    .label {
+        font-size: 14px;
+        opacity: 0.8;
+    }
 
-.app img {
-  width: 80px;
-  height: 80px;
-  border-radius: 18px;
-  margin-right: 15px;
-}
+    .value {
+        font-size: 18px;
+        font-weight: bold;
+        margin-top: 5px;
+    }
 </style>
 </head>
-
 <body>
 
-<!-- INSTALL SCREEN -->
-<div id="install">
-  <img src="icon.png">
-  <h2>Установите приложение</h2>
-  <p id="platformText"></p>
-  <button id="installBtn">Установить</button>
-  <a id="apk" href="app.apk" download>Скачать APK</a>
-</div>
+<div class="weather-container">
+    <div class="city" id="city"></div>
+    <div class="temp" id="temp"></div>
+    <div class="desc" id="desc"></div>
 
-<!-- STORE -->
-<div id="store" class="hidden">
-  <div class="header">Приложения</div>
-  <div id="apps"></div>
+    <div class="details">
+        <div class="card">
+            <div class="label">Влажность</div>
+            <div class="value" id="humidity"></div>
+        </div>
+
+        <div class="card">
+            <div class="label">Ветер</div>
+            <div class="value" id="wind"></div>
+        </div>
+
+        <div class="card">
+            <div class="label">Давление</div>
+            <div class="value" id="pressure"></div>
+        </div>
+
+        <div class="card">
+            <div class="label">Ощущается как</div>
+            <div class="value" id="feels"></div>
+        </div>
+    </div>
 </div>
 
 <script>
-/* ================= НАСТРОЙКИ ================= */
-const APPS = [
-  {
-    name: "My App",
-    description: "Описание приложения",
-    icon: "icon.png",
-    url: "https://your-pwa-site.com"
-  },
-  {
-    name: "Second App",
-    description: "Второе приложение",
-    icon: "icon.png",
-    url: "https://example.com"
-  }
-];
+/*
+    ===== ВПИСЫВАЙ ПОГОДУ ЗДЕСЬ =====
+*/
 
-/* ================= PLATFORM ================= */
-const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-const isAndroid = /android/i.test(navigator.userAgent);
-
-const installScreen = document.getElementById('install');
-const store = document.getElementById('store');
-const appsContainer = document.getElementById('apps');
-const installBtn = document.getElementById('installBtn');
-const apk = document.getElementById('apk');
-const platformText = document.getElementById('platformText');
-
-let deferredPrompt = null;
-
-/* ================= PLATFORM TEXT ================= */
-if (isIOS) {
-  platformText.innerHTML = 'Нажмите <b>Поделиться</b> → <b>На экран «Домой»</b>';
-  installBtn.style.display = 'none';
-}
-
-if (isAndroid) {
-  platformText.innerText = 'Установите PWA или скачайте APK';
-  apk.style.display = 'block';
-}
-
-/* ================= INSTALL PROMPT ================= */
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  deferredPrompt = e;
-});
-
-installBtn.onclick = async () => {
-  if (!deferredPrompt) return;
-  deferredPrompt.prompt();
-  await deferredPrompt.userChoice;
-  deferredPrompt = null;
+const weatherData = {
+    city: "Ориенбаум",
+    temp: "-18°C",
+    desc: "Ясно",
+    humidity: "75%",
+    wind: "0 м/с",
+    pressure: "771 мм",
+    feels: "-24°C"
+};
+      city: "Ивало",
+    temp: "-2°C",
+    desc: "Ясно",
+    humidity: "64%",
+    wind: "2 м/с",
+    pressure: "754 мм",
+    feels: "-1°C"
+};
+    city: "Минск",
+    temp: "-21°C",
+    desc: "Ясно",
+    humidity: "89%",
+    wind: "4 м/с",
+    pressure: "770 мм",
+    feels: "-30°C"
 };
 
-/* ================= CHECK IF PWA ================= */
-function checkIfInstalled() {
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-                       || window.navigator.standalone === true;
+/*
+    ===== НЕ ТРОГАЙ НИЖЕ ЕСЛИ НЕ НУЖНО =====
+*/
 
-  // сохраняем флаг в localStorage
-  if (isStandalone) localStorage.setItem('pwaInstalled', 'true');
-
-  // показываем магазин, если standalone или уже установлен ранее
-  if (isStandalone || localStorage.getItem('pwaInstalled') === 'true') {
-    installScreen.classList.add('hidden');
-    store.classList.remove('hidden');
-    renderApps();
-  } else {
-    installScreen.classList.remove('hidden');
-    store.classList.add('hidden');
-  }
-}
-
-/* ================= RENDER APPS ================= */
-function renderApps() {
-  appsContainer.innerHTML = '';
-  APPS.forEach(app => {
-    const div = document.createElement('div');
-    div.className = 'app';
-    div.innerHTML = `
-      <img src="${app.icon}">
-      <div>
-        <h3>${app.name}</h3>
-        <p>${app.description}</p>
-        <button onclick="openApp('${app.url}')">Открыть</button>
-      </div>
-    `;
-    appsContainer.appendChild(div);
-  });
-}
-
-function openApp(url) {
-  window.location.href = url;
-}
-
-/* ================= EVENTS ================= */
-window.addEventListener('load', checkIfInstalled);
-window.addEventListener('appinstalled', checkIfInstalled);
-
-/* ================= SERVICE WORKER ================= */
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js')
-    .then(() => console.log('Service Worker зарегистрирован'))
-    .catch(err => console.log('Ошибка SW:', err));
-}
+document.getElementById("city").textContent = weatherData.city;
+document.getElementById("temp").textContent = weatherData.temp;
+document.getElementById("desc").textContent = weatherData.desc;
+document.getElementById("humidity").textContent = weatherData.humidity;
+document.getElementById("wind").textContent = weatherData.wind;
+document.getElementById("pressure").textContent = weatherData.pressure;
+document.getElementById("feels").textContent = weatherData.feels;
 </script>
 
 </body>
