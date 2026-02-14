@@ -17,7 +17,6 @@
             justify-content: center;
         }
 
-        /* Сетка карточек */
         #weather-container {
             display: flex;
             flex-wrap: wrap;
@@ -59,13 +58,20 @@
         }
 
         .weather-desc {
-            font-size: 1rem;
-            opacity: 0.9;
+            font-size: 1.1rem;
             margin-bottom: 15px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
+        
+        /* Цвета для динамичных иконок */
+        .weather-desc i.fa-sun { color: #ffd700; }
+        .weather-desc i.fa-snowflake { color: #e0f7fa; }
+        .weather-desc i.fa-cloud { color: #cfd8dc; }
+        .weather-desc i.fa-cloud-rain, .weather-desc i.fa-droplet { color: #90caf9; }
+        .weather-desc i.fa-bolt, .weather-desc i.fa-cloud-bolt { color: #ffeb3b; }
+        .weather-desc i.fa-wind { color: #b0bec5; }
 
         .main-temp {
             font-size: 3.5rem;
@@ -99,7 +105,6 @@
             color: #4facfe;
         }
 
-        /* Модальное окно (всплывающая карточка) */
         #modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -155,11 +160,8 @@
             transition: background 0.2s;
         }
 
-        .close-btn:hover {
-            background: rgba(255,255,255,0.4);
-        }
+        .close-btn:hover { background: rgba(255,255,255,0.4); }
 
-        /* Прогноз на день */
         .forecast-container {
             margin-top: 25px;
             border-top: 1px solid rgba(255,255,255,0.2);
@@ -170,7 +172,6 @@
             padding-bottom: 10px;
         }
 
-        /* Скрываем скроллбар для красоты */
         .forecast-container::-webkit-scrollbar { display: none; }
         
         .forecast-item {
@@ -181,26 +182,14 @@
             min-width: 60px;
         }
 
-        .forecast-time {
-            font-size: 0.85rem;
-            opacity: 0.8;
-        }
-
-        .forecast-icon {
-            font-size: 1.5rem;
-            color: #ffd700;
-        }
-
-        .forecast-temp {
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
+        .forecast-time { font-size: 0.85rem; opacity: 0.8; }
+        .forecast-icon { font-size: 1.5rem; color: #ffd700; }
+        .forecast-temp { font-weight: bold; font-size: 1.1rem; }
     </style>
 </head>
 <body>
 
-    <div id="weather-container">
-        </div>
+    <div id="weather-container"></div>
 
     <div id="modal-overlay" onclick="closeModal(event)">
         <div class="modal-card" onclick="event.stopPropagation()">
@@ -208,7 +197,7 @@
             <div class="city-name" id="modal-city">Город</div>
             <div class="country-name" id="modal-country">Страна</div>
             <div class="main-temp" id="modal-temp">0°C</div>
-            <div class="weather-desc" id="modal-desc"><i class="fas fa-sun"></i> Ясно</div>
+            <div class="weather-desc" id="modal-desc"></div>
             
             <div class="stats">
                 <div class="stat-item">
@@ -229,13 +218,11 @@
                 </div>
             </div>
 
-            <div class="forecast-container" id="modal-forecast">
-                </div>
+            <div class="forecast-container" id="modal-forecast"></div>
         </div>
     </div>
 
     <script>
-        // Твои данные с добавленными странами и прогнозом на день (forecast)
         const weatherData = [
             {
                 city: "Ориенбаум",
@@ -288,7 +275,7 @@
                     { time: "21:00", icon: "fa-moon", temp: "-25°C" }
                 ]
             },
-               {
+            {
                 city: "Астана",
                 country: "Казахстан",
                 temp: "-18°C",
@@ -307,20 +294,49 @@
             }
         ];
 
+        // Функция-помощник: подбирает иконки по слову в описании
+        function getDynamicIcons(desc) {
+            const lowerDesc = desc.toLowerCase();
+            let iconsHtml = '';
+
+            if (lowerDesc.includes('летний шторм')) {
+                iconsHtml = '<i class="fas fa-wind"></i><i class="fas fa-cloud-rain"></i>';
+            } else if (lowerDesc.includes('шторм')) {
+                iconsHtml = '<i class="fas fa-wind"></i><i class="fas fa-snowflake"></i><i class="fas fa-snowflake"></i>';
+            } else if (lowerDesc.includes('метель')) {
+                iconsHtml = '<i class="fas fa-snowflake"></i><i class="fas fa-snowflake"></i>';
+            } else if (lowerDesc.includes('гроза')) {
+                iconsHtml = '<i class="fas fa-cloud-bolt"></i><i class="fas fa-droplet"></i>';
+            } else if (lowerDesc.includes('дождь')) {
+                iconsHtml = '<i class="fas fa-cloud-rain"></i>';
+            } else if (lowerDesc.includes('снегопад')) {
+                iconsHtml = '<i class="fas fa-snowflake"></i>';
+            } else if (lowerDesc.includes('ветрено')) {
+                iconsHtml = '<i class="fas fa-wind"></i>';
+            } else if (lowerDesc.includes('облачно')) {
+                iconsHtml = '<i class="fas fa-cloud"></i>';
+            } else if (lowerDesc.includes('ясно')) {
+                iconsHtml = '<i class="fas fa-sun"></i>';
+            } else {
+                iconsHtml = '<i class="fas fa-sun"></i>'; // По умолчанию
+            }
+
+            return `${iconsHtml} <span>${desc}</span>`;
+        }
+
         const container = document.getElementById('weather-container');
         const modalOverlay = document.getElementById('modal-overlay');
 
-        // Отрисовка главных карточек
         weatherData.forEach((data, index) => {
             const card = document.createElement('div');
             card.className = 'card';
-            card.onclick = () => openModal(index); // Добавляем клик для открытия
+            card.onclick = () => openModal(index);
             
             card.innerHTML = `
                 <div class="city-name">${data.city}</div>
                 <div class="country-name">${data.country}</div>
                 <div class="weather-desc">
-                    <i class="fas fa-sun"></i> ${data.desc}
+                    ${getDynamicIcons(data.desc)}
                 </div>
                 <div class="main-temp">${data.temp}</div>
                 <div class="stats">
@@ -345,30 +361,28 @@
             container.appendChild(card);
         });
 
-        // Функция открытия модального окна
         function openModal(index) {
             const data = weatherData[index];
             
-            // Заполняем основные данные
             document.getElementById('modal-city').innerText = data.city;
             document.getElementById('modal-country').innerText = data.country;
             document.getElementById('modal-temp').innerText = data.temp;
-            document.getElementById('modal-desc').innerHTML = `<i class="fas fa-sun"></i> ${data.desc}`;
+            
+            // Вставляем динамичные иконки и в модальное окно
+            document.getElementById('modal-desc').innerHTML = getDynamicIcons(data.desc);
             
             document.getElementById('modal-wind').innerHTML = `<i class="fas fa-wind"></i>${data.wind}`;
             document.getElementById('modal-humidity').innerHTML = `<i class="fas fa-droplet"></i>${data.humidity}`;
             document.getElementById('modal-pressure').innerHTML = `<i class="fas fa-gauge-high"></i>${data.pressure}`;
             document.getElementById('modal-feels').innerHTML = `<i class="fas fa-thermometer-half"></i>${data.feels}`;
 
-            // Заполняем прогноз
             const forecastContainer = document.getElementById('modal-forecast');
-            forecastContainer.innerHTML = ''; // Очищаем старый прогноз
+            forecastContainer.innerHTML = ''; 
             
             data.forecast.forEach(item => {
                 const forecastItem = document.createElement('div');
                 forecastItem.className = 'forecast-item';
-                // Если иконка луны, делаем её белой/синей, если солнце - желтой
-                const iconColor = item.icon.includes('moon') || item.icon.includes('snowflake') ? '#a0c4ff' : '#ffd700';
+                const iconColor = item.icon.includes('moon') || item.icon.includes('snowflake') ? '#e0f7fa' : '#ffd700';
                 
                 forecastItem.innerHTML = `
                     <div class="forecast-time">${item.time}</div>
@@ -378,17 +392,14 @@
                 forecastContainer.appendChild(forecastItem);
             });
 
-            // Показываем модалку
             modalOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden'; // Запрещаем скролл страницы на фоне
+            document.body.style.overflow = 'hidden'; 
         }
 
-        // Функция закрытия
         function closeModal(event) {
-            // Закрываем, если кликнули на крестик или на темный фон вне карточки
             if(event.target === modalOverlay || event.target.closest('.close-btn')) {
                 modalOverlay.classList.remove('active');
-                document.body.style.overflow = ''; // Возвращаем скролл
+                document.body.style.overflow = ''; 
             }
         }
     </script>
