@@ -1,15 +1,21 @@
 {
-  "name": "Mini App Store",
-  "short_name": "AppStore",
-  "description": "Мини-магазин PWA и APK приложений",
-  "start_url": "./",
-  "scope": "./",
+  "name": "SkyCast: Мониторинг погоды",
+  "short_name": "SkyCast",
+  "description": "Стильный прогноз погоды для любимых городов",
+  "start_url": "index.html",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#f2f2f7",
-  "theme_color": "#ffffff",
+  "background_color": "#1e3c72",
+  "theme_color": "#2a5298",
   "icons": [
-    { "src": "icon.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icon.png", "sizes": "512x512", "type": "image/png" }
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/1163/1163736.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/1163/1163736.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ]
 }
