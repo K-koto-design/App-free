@@ -17,12 +17,14 @@
             justify-content: center;
         }
 
+        /* Сетка карточек */
         #weather-container {
             display: flex;
             flex-wrap: wrap;
             gap: 25px;
             justify-content: center;
             max-width: 1200px;
+            z-index: 1;
         }
 
         .card {
@@ -32,7 +34,8 @@
             border-radius: 24px;
             padding: 25px;
             width: 280px;
-            transition: transform 0.3s ease;
+            cursor: pointer;
+            transition: transform 0.3s ease, background 0.3s ease;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
 
@@ -44,14 +47,21 @@
         .city-name {
             font-size: 1.6rem;
             font-weight: bold;
-            margin-bottom: 5px;
             color: #fff;
+        }
+
+        .country-name {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .weather-desc {
             font-size: 1rem;
             opacity: 0.9;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -89,11 +99,101 @@
             color: #4facfe;
         }
 
-        .feels-like {
-            grid-column: span 2;
-            margin-top: 5px;
-            font-style: italic;
+        /* Модальное окно (всплывающая карточка) */
+        #modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        #modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 30px;
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        #modal-overlay.active .modal-card {
+            transform: scale(1);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .close-btn:hover {
+            background: rgba(255,255,255,0.4);
+        }
+
+        /* Прогноз на день */
+        .forecast-container {
+            margin-top: 25px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            padding-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        /* Скрываем скроллбар для красоты */
+        .forecast-container::-webkit-scrollbar { display: none; }
+        
+        .forecast-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            min-width: 60px;
+        }
+
+        .forecast-time {
+            font-size: 0.85rem;
             opacity: 0.8;
+        }
+
+        .forecast-icon {
+            font-size: 1.5rem;
+            color: #ffd700;
+        }
+
+        .forecast-temp {
+            font-weight: bold;
+            font-size: 1.1rem;
         }
     </style>
 </head>
@@ -102,47 +202,106 @@
     <div id="weather-container">
         </div>
 
+    <div id="modal-overlay" onclick="closeModal(event)">
+        <div class="modal-card" onclick="event.stopPropagation()">
+            <button class="close-btn" onclick="closeModal(event)"><i class="fas fa-times"></i></button>
+            <div class="city-name" id="modal-city">Город</div>
+            <div class="country-name" id="modal-country">Страна</div>
+            <div class="main-temp" id="modal-temp">0°C</div>
+            <div class="weather-desc" id="modal-desc"><i class="fas fa-sun"></i> Ясно</div>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <span>Ветер</span>
+                    <div id="modal-wind"><i class="fas fa-wind"></i>0 м/с</div>
+                </div>
+                <div class="stat-item">
+                    <span>Влажность</span>
+                    <div id="modal-humidity"><i class="fas fa-droplet"></i>0%</div>
+                </div>
+                <div class="stat-item">
+                    <span>Давление</span>
+                    <div id="modal-pressure"><i class="fas fa-gauge-high"></i>0 мм</div>
+                </div>
+                <div class="stat-item">
+                    <span>Ощущается</span>
+                    <div id="modal-feels"><i class="fas fa-thermometer-half"></i>0°C</div>
+                </div>
+            </div>
+
+            <div class="forecast-container" id="modal-forecast">
+                </div>
+        </div>
+    </div>
+
     <script>
-        // Твои данные, которые ты можешь редактировать
+        // Твои данные с добавленными странами и прогнозом на день (forecast)
         const weatherData = [
             {
                 city: "Ораниенбаум",
+                country: "Россия",
                 temp: "-18°C",
                 desc: "Ясно",
                 humidity: "75%",
                 wind: "0 м/с",
                 pressure: "771 мм",
-                feels: "-24°C"
+                feels: "-24°C",
+                forecast: [
+                    { time: "09:00", icon: "fa-sun", temp: "-20°C" },
+                    { time: "12:00", icon: "fa-sun", temp: "-18°C" },
+                    { time: "15:00", icon: "fa-cloud-sun", temp: "-17°C" },
+                    { time: "18:00", icon: "fa-moon", temp: "-21°C" },
+                    { time: "21:00", icon: "fa-moon", temp: "-23°C" }
+                ]
             },
             {
                 city: "Ивало",
+                country: "Финляндия",
                 temp: "-2°C",
                 desc: "Ясно",
                 humidity: "64%",
                 wind: "2 м/с",
                 pressure: "754 мм",
-                feels: "-1°C"
+                feels: "-1°C",
+                forecast: [
+                    { time: "09:00", icon: "fa-cloud", temp: "-4°C" },
+                    { time: "12:00", icon: "fa-sun", temp: "-2°C" },
+                    { time: "15:00", icon: "fa-sun", temp: "-2°C" },
+                    { time: "18:00", icon: "fa-cloud-moon", temp: "-5°C" },
+                    { time: "21:00", icon: "fa-snowflake", temp: "-7°C" }
+                ]
             },
             {
                 city: "Минск",
+                country: "Беларусь",
                 temp: "-21°C",
                 desc: "Ясно",
                 humidity: "89%",
                 wind: "4 м/с",
                 pressure: "770 мм",
-                feels: "-30°C"
+                feels: "-30°C",
+                forecast: [
+                    { time: "09:00", icon: "fa-sun", temp: "-24°C" },
+                    { time: "12:00", icon: "fa-sun", temp: "-21°C" },
+                    { time: "15:00", icon: "fa-sun", temp: "-20°C" },
+                    { time: "18:00", icon: "fa-moon", temp: "-25°C" },
+                    { time: "21:00", icon: "fa-moon", temp: "-27°C" }
+                ]
             }
         ];
 
         const container = document.getElementById('weather-container');
+        const modalOverlay = document.getElementById('modal-overlay');
 
-        // Функция для отрисовки карточек
-        weatherData.forEach(data => {
+        // Отрисовка главных карточек
+        weatherData.forEach((data, index) => {
             const card = document.createElement('div');
             card.className = 'card';
+            card.onclick = () => openModal(index); // Добавляем клик для открытия
             
             card.innerHTML = `
                 <div class="city-name">${data.city}</div>
+                <div class="country-name">${data.country}</div>
                 <div class="weather-desc">
                     <i class="fas fa-sun"></i> ${data.desc}
                 </div>
@@ -162,12 +321,59 @@
                     </div>
                     <div class="stat-item">
                         <span>Ощущается</span>
-                        <div><i class="fas fa-termometer-half"></i>${data.feels}</div>
+                        <div><i class="fas fa-thermometer-half"></i>${data.feels}</div>
                     </div>
                 </div>
             `;
             container.appendChild(card);
         });
+
+        // Функция открытия модального окна
+        function openModal(index) {
+            const data = weatherData[index];
+            
+            // Заполняем основные данные
+            document.getElementById('modal-city').innerText = data.city;
+            document.getElementById('modal-country').innerText = data.country;
+            document.getElementById('modal-temp').innerText = data.temp;
+            document.getElementById('modal-desc').innerHTML = `<i class="fas fa-sun"></i> ${data.desc}`;
+            
+            document.getElementById('modal-wind').innerHTML = `<i class="fas fa-wind"></i>${data.wind}`;
+            document.getElementById('modal-humidity').innerHTML = `<i class="fas fa-droplet"></i>${data.humidity}`;
+            document.getElementById('modal-pressure').innerHTML = `<i class="fas fa-gauge-high"></i>${data.pressure}`;
+            document.getElementById('modal-feels').innerHTML = `<i class="fas fa-thermometer-half"></i>${data.feels}`;
+
+            // Заполняем прогноз
+            const forecastContainer = document.getElementById('modal-forecast');
+            forecastContainer.innerHTML = ''; // Очищаем старый прогноз
+            
+            data.forecast.forEach(item => {
+                const forecastItem = document.createElement('div');
+                forecastItem.className = 'forecast-item';
+                // Если иконка луны, делаем её белой/синей, если солнце - желтой
+                const iconColor = item.icon.includes('moon') || item.icon.includes('snowflake') ? '#a0c4ff' : '#ffd700';
+                
+                forecastItem.innerHTML = `
+                    <div class="forecast-time">${item.time}</div>
+                    <i class="fas ${item.icon} forecast-icon" style="color: ${iconColor};"></i>
+                    <div class="forecast-temp">${item.temp}</div>
+                `;
+                forecastContainer.appendChild(forecastItem);
+            });
+
+            // Показываем модалку
+            modalOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Запрещаем скролл страницы на фоне
+        }
+
+        // Функция закрытия
+        function closeModal(event) {
+            // Закрываем, если кликнули на крестик или на темный фон вне карточки
+            if(event.target === modalOverlay || event.target.closest('.close-btn')) {
+                modalOverlay.classList.remove('active');
+                document.body.style.overflow = ''; // Возвращаем скролл
+            }
+        }
     </script>
 </body>
 </html>
