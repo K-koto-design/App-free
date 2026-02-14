@@ -1,6 +1,19 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2a5298">
+<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1163/1163736.png">
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('Service Worker зарегистрирован!'))
+        .catch(err => console.log('Ошибка SW:', err));
+    });
+  }
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Мониторинг Погоды</title>
